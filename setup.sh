@@ -1,22 +1,55 @@
 #!/usr/bin/env bash
-# setup.sh — minimal project setup
-
 set -euo pipefail
 
-echo "== minimal setup =="
+echo "== setup (venv-first) =="
 
-# 1) make helper scripts executable (only if they exist)
-[[ -f scripts/run_local.sh ]] && chmod +x scripts/run_local.sh && echo "✓ chmod +x scripts/run_local.sh"
-[[ -f slurm/run.sh ]]         && chmod +x slurm/run.sh         && echo "✓ chmod +x slurm/run.sh"
-[[ -f slurm/array.sbatch ]]   && chmod +x slurm/array.sbatch   && echo "✓ chmod +x slurm/array.sbatch"
+# --- resolve repo root ---
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${REPO_ROOT}"
 
-# 2) create the few folders we write to
-mkdir -p results/runs results/summary logs data/raw data/processed data/splits
-echo "✓ created results/, logs/, data/"
+# --- parameters ---
+PYBIN="${PYBIN:-python3}"
+VENV_DIR="${VENV_DIR:-.venv}"
 
-# 3) (optional) install requirements into the CURRENT Python env
+echo "• Python: ${PYBIN}"
+echo "• venv  : ${VENV_DIR}"
+
+# --- mark helper scripts executable if present ---
+mkdir -p scripts slurm logs results/runs results/summary data/raw data/processed data/splits
+
+for f in scripts/run_local.sh scripts/smoke_local.sh scripts/smoke_slurm.sh scripts/make_jobs.py; do
+  if [[ -f "$f" ]]; then
+    chmod +x "$f" || true
+    echo "✓ chmod +x $f"
+  fi
+done
+
+for f in slurm/run.sh slurm/array.sbatch; do
+  if [[ -f "$f" ]]; then
+    chmod +x "$f" || true
+    echo "✓ chmod +x $f"
+  fi
+done
+
+echo "✓ created results/, logs/, data/ folders"
+
+# --- create or reuse venv ---
+if [[ ! -d "${VENV_DIR}" ]]; then
+  echo "→ creating virtualenv at ${VENV_DIR}"
+  "${PYBIN}" -m venv "${VENV_DIR}"
+else
+  echo "• reusing existing venv at ${VENV_DIR}"
+fi
+
+# shellcheck disable=SC1091
+source "${VENV_DIR}/bin/activate"
+
+python -V
+pip -V
+
+# --- install requirements into the venv (if present) ---
 if [[ -f requirements.txt ]]; then
-  echo "→ installing requirements.txt into current Python environment..."
+  echo "→ installing requirements.txt into venv..."
   python -m pip install --upgrade pip
   python -m pip install -r requirements.txt
   echo "✓ requirements installed"
@@ -24,11 +57,10 @@ else
   echo "• no requirements.txt found — skipping install"
 fi
 
-# 4) small sanity note about the jobs grid
-[[ ! -file scripts/make_jobs.py ]] && echo "• WARNING: scripts/make_jobs.py not found — generate scripts/jobs.tsv manually" || true
-
-echo "== done =="
+echo "== setup done =="
 echo "next steps:"
-echo "  1) generate jobs:   python scripts/make_jobs.py --datasets chameleon --seeds 1,2 --K 8 --bands 3 --tau 0.5,1.5,4.0"
-echo "  2) run one job:     bash scripts/run_local.sh 0"
-echo "  3) submit on SLURM: sbatch slurm/array.sbatch   (edit --array range first)"
+echo "  1) activate venv in this shell:  source ${VENV_DIR}/bin/activate"
+echo "  2) quick local smoke test:       bash scripts/smoke_local.sh   (optional)"
+echo "  3) build a jobs grid:            python scripts/make_jobs.py --datasets chameleon --seeds 1,2 --K 8 --bands 3 --tau 0.5,1.5,4.0 --out scripts/jobs.tsv"
+echo "  4) run one job:                  bash scripts/run_local.sh 0"
+echo "  5) submit SLURM array:           sbatch slurm/array.sbatch   (edit --array range first)"
