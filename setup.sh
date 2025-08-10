@@ -32,35 +32,3 @@ for f in slurm/run.sh slurm/array.sbatch; do
 done
 
 echo "✓ created results/, logs/, data/ folders"
-
-# --- create or reuse venv ---
-if [[ ! -d "${VENV_DIR}" ]]; then
-  echo "→ creating virtualenv at ${VENV_DIR}"
-  "${PYBIN}" -m venv "${VENV_DIR}"
-else
-  echo "• reusing existing venv at ${VENV_DIR}"
-fi
-
-# shellcheck disable=SC1091
-source "${VENV_DIR}/bin/activate"
-
-python -V
-pip -V
-
-# --- install requirements into the venv (if present) ---
-if [[ -f requirements.txt ]]; then
-  echo "→ installing requirements.txt into venv..."
-  python -m pip install --upgrade pip
-  python -m pip install -r requirements.txt
-  echo "✓ requirements installed"
-else
-  echo "• no requirements.txt found — skipping install"
-fi
-
-echo "== setup done =="
-echo "next steps:"
-echo "  1) activate venv in this shell:  source ${VENV_DIR}/bin/activate"
-echo "  2) quick local smoke test:       bash scripts/smoke_local.sh   (optional)"
-echo "  3) build a jobs grid:            python scripts/make_jobs.py --datasets chameleon --seeds 1,2 --K 8 --bands 3 --tau 0.5,1.5,4.0 --out scripts/jobs.tsv"
-echo "  4) run one job:                  bash scripts/run_local.sh 0"
-echo "  5) submit SLURM array:           sbatch slurm/array.sbatch   (edit --array range first)"
