@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
-# scripts/smoke_slurm.sh
+# smoke_slurm.sh
 # Build a 2-row jobs.tsv (MB-TFE + TFE on Cora) and submit a small SLURM array
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Repo root = folder containing this script
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${REPO_ROOT}"
 
-mkdir -p scripts logs results/runs
+mkdir -p "${REPO_ROOT}/scripts" "${REPO_ROOT}/logs" "${REPO_ROOT}/results/runs"
 
 # 1) make tiny job sets (two files) and then combine them
-python3 MB-TFEGNN/scripts/make_jobs.py \
+python3 "${REPO_ROOT}/scripts/make_jobs.py" \
   --datasets cora \
   --model mbtfe \
   --seeds 1 \
@@ -20,9 +21,9 @@ python3 MB-TFEGNN/scripts/make_jobs.py \
   --hidden 64 --layers 1 --dropout 0.5 \
   --lr 1e-3 --wd 5e-5 \
   --epochs 50 --patience 10 \
-  --out MB-TFEGNN/scripts/jobs_mbtfe.tsv
+  --out "${REPO_ROOT}/scripts/jobs_mbtfe.tsv"
 
-python3 MB-TFEGNN/scripts/make_jobs.py \
+python3 "${REPO_ROOT}/scripts/make_jobs.py" \
   --datasets cora \
   --model tfe \
   --seeds 1 \
@@ -32,13 +33,13 @@ python3 MB-TFEGNN/scripts/make_jobs.py \
   --hidden 64 --layers 1 --dropout 0.5 \
   --lr 1e-3 --wd 5e-5 \
   --epochs 50 --patience 10 \
-  --out MB-TFEGNN/scripts/jobs_tfe.tsv
+  --out "${REPO_ROOT}/scripts/jobs_tfe.tsv"
 
 # Combine (keep header from the first, append rows from the second)
-cp MB-TFEGNN/scripts/jobs_mbtfe.tsv MB-TFEGNN/scripts/jobs.tsv
-tail -n +2 MB-TFEGNN/scripts/jobs_tfe.tsv >> MB-TFEGNN/scripts/jobs.tsv
+cp "${REPO_ROOT}/scripts/jobs_mbtfe.tsv" "${REPO_ROOT}/scripts/jobs.tsv"
+tail -n +2 "${REPO_ROOT}/scripts/jobs_tfe.tsv" >> "${REPO_ROOT}/scripts/jobs.tsv"
 
 # 2) submit a tiny array job (index 0-1, concurrency 2)
 echo "Submitting SLURM array for 2 smoke jobs..."
-sbatch --array=0-1%2 MB-TFEGNN/slurm/array.sbatch
+sbatch --chdir "${REPO_ROOT}" --array=0-1%2 slurm/array.sbatch
 echo "Submitted. Check with: squeue -u $USER"
