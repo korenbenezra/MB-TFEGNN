@@ -8,8 +8,9 @@
 #SBATCH --mem=16G
 #SBATCH --output=logs/slurm_%A_%a.out
 #SBATCH --error=logs/slurm_%A_%a.err
-# #SBATCH --constraint="geforce_rtx_3090|l40s|a6000"   # optional: request specific GPU models
-# #SBATCH --account=<your-account>                     # if your default account can't use this partition
+#SBATCH --constraint="geforce_rtx_3090"   # optional: request specific GPU models
+#SBATCH --account=ronmondshein
+
 
 # ensure logs dir exists
 mkdir -p logs
