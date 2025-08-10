@@ -18,7 +18,7 @@ echo "[run.sh] INDEX=${INDEX}"
 # Add repo to PYTHONPATH in case sbatch launches from a different CWD
 export PYTHONPATH="$PYTHONPATH:${REPO_ROOT}"
 
-python -m src.main \
+python3 -m src.main \
   --from-tsv "${JOBS_TSV}" \
   --index "${INDEX}" \
   --outdir "${REPO_ROOT}/results/runs"
