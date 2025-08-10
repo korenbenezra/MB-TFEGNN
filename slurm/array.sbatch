@@ -11,8 +11,12 @@
 
 mkdir -p logs
 
-# keep repo on PYTHONPATH
 export PYTHONPATH="$PYTHONPATH:$(pwd)"
 
-# delegate to run.sh with the array index
+source "$HOME/miniconda3/etc/profile.d/conda.sh"
+
+conda activate mbtfe
+
+export PYTHONPATH="$PYTHONPATH:$(pwd)"
+
 bash slurm/run.sh "$SLURM_ARRAY_TASK_ID"
