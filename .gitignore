@@ -1,0 +1,78 @@
+# -----------------------
+# Python / build artifacts
+# -----------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+*.dylib
+*.dll
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+
+# Packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_save/
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.code-workspace
+
+# -----------------------
+# Project-specific
+# -----------------------
+
+# Data (keep small text configs; ignore large/raw tensors)
+data/raw/
+data/processed/
+data/splits/*.pt
+data/*.pt
+
+# Cache
+cache/
+.cache/
+
+# Results & logs
+results/runs/
+results/summary/*.csv
+results/summary/*.png
+results/summary/*.pdf
+logs/
+*.out
+*.err
+
+# Checkpoints & tensors (anywhere)
+**/*.pt
+**/*.pth
+**/*.ckpt
+
+# SLURM job arrays metadata (optional)
+scripts/jobs.tsv
+
+# Poetry / pipenv (if used)
+.poetry/
+Pipfile.lock
+poetry.lock
+
+# PyTorch Lightning / TensorBoard (if you add later)
+lightning_logs/
+tb_logs/
+events.out.tfevents.*
