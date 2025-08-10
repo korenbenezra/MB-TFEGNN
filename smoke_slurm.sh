@@ -10,7 +10,7 @@ cd "${REPO_ROOT}"
 mkdir -p scripts logs results/runs
 
 # 1) make tiny job sets (two files) and then combine them
-python scripts/make_jobs.py \
+python3 mb-tfegnn/scripts/make_jobs.py \
   --datasets cora \
   --model mbtfe \
   --seeds 1 \
@@ -20,9 +20,9 @@ python scripts/make_jobs.py \
   --hidden 64 --layers 1 --dropout 0.5 \
   --lr 1e-3 --wd 5e-5 \
   --epochs 50 --patience 10 \
-  --out scripts/jobs_mbtfe.tsv
+  --out mb-tfegnn/scripts/jobs_mbtfe.tsv
 
-python scripts/make_jobs.py \
+python3 mb-tfegnn/scripts/make_jobs.py \
   --datasets cora \
   --model tfe \
   --seeds 1 \
@@ -32,13 +32,13 @@ python scripts/make_jobs.py \
   --hidden 64 --layers 1 --dropout 0.5 \
   --lr 1e-3 --wd 5e-5 \
   --epochs 50 --patience 10 \
-  --out scripts/jobs_tfe.tsv
+  --out mb-tfegnn/scripts/jobs_tfe.tsv
 
 # Combine (keep header from the first, append rows from the second)
-cp scripts/jobs_mbtfe.tsv scripts/jobs.tsv
-tail -n +2 scripts/jobs_tfe.tsv >> scripts/jobs.tsv
+cp mb-tfegnn/scripts/jobs_mbtfe.tsv mb-tfegnn/scripts/jobs.tsv
+tail -n +2 mb-tfegnn/scripts/jobs_tfe.tsv >> mb-tfegnn/scripts/jobs.tsv
 
 # 2) submit a tiny array job (index 0-1, concurrency 2)
 echo "Submitting SLURM array for 2 smoke jobs..."
-sbatch --array=0-1%2 slurm/array.sbatch
+sbatch --array=0-1%2 mb-tfegnn/slurm/array.sbatch
 echo "Submitted. Check with: squeue -u $USER"
