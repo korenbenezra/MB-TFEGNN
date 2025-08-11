@@ -46,12 +46,8 @@ class MBTFEModel(nn.Module):
         self.dropout = nn.Dropout(dropout)
         self._last_div_total = torch.tensor(0.0)
 
-    def forward(
-        self,
-        X: torch.Tensor,
-        L_hat: torch.Tensor,
-        need_aux: bool = False,
-    ) -> torch.Tensor | tuple[torch.Tensor, dict[str, object]]:
+    def forward(self, X: torch.Tensor, L_hat: torch.Tensor, 
+                need_aux: bool = False) -> torch.Tensor | tuple[torch.Tensor, dict[str, object]]:
         aux_all = {"layers": []}
         div_total = X0(X)
 
@@ -62,8 +58,11 @@ class MBTFEModel(nn.Module):
                 aux_all["layers"].append(aux)
             else:
                 H = layer(H, L_hat, need_aux=False)
-            div_total = div_total + layer.diversity_loss()
-
+                
+            if isinstance(layer, MBTFEConv) and layer.use_diversity:
+                div_total = div_total + layer.diversity_loss()
+            else:
+                div_total = div_total
         logits = self.classifier(self.dropout(H))
         self._last_div_total = div_total.detach()
 

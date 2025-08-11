@@ -147,8 +147,8 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     model.eval()
     with torch.no_grad():
         out = metrics.evaluate(model, X, L_hat, y,
-                               masks={"train": train_mask, "val": val_mask, "test": test_mask},
-                               device=device, need_aux=True)
+                                masks={"train": train_mask, "val": val_mask, "test": test_mask},
+                                device=device, need_aux=True)
         final = {
             "acc_train": float(out["acc_train"]),
             "acc_val": float(out["acc_val"]),
@@ -162,15 +162,15 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         sigmas = parse_float_list(args.robust_feature_noise)
         if sigmas:
             final["robust_feature_noise"] = metrics.feature_noise_eval(model, X, L_hat, y,
-                                                                       masks={"test": test_mask},
-                                                                       sigmas=sigmas)
+                                                                        masks={"test": test_mask},
+                                                                        sigmas=sigmas)
         ps = parse_float_list(args.robust_edge_drop)
         if ps:
             # need L_sym to rebuild when dropping edges; pull from loader again (CPU ok)
             L_sym = ds["L_sym"].to(device)
             final["robust_edge_drop"] = metrics.edge_dropout_eval(model, X, L_sym, y,
-                                                                  masks={"test": test_mask},
-                                                                  ps=ps)
+                                                                    masks={"test": test_mask},
+                                                                    ps=ps)
 
     # ---------- save metrics ----------
     utils.save_json(Path(run_dir) / "metrics.json", final)
@@ -180,3 +180,15 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     # console summary
     print(json.dumps({"BEST_VAL_ACC": best_val_acc, "RUN_DIR": str(run_dir)}, indent=2))
     return final
+
+    # NEW: final eval (best checkpoint)
+    # final = do_final_eval_and_plots(
+    #     model=model,
+    #     saver=saver,
+    #     X=X, L_hat=L_hat, y=y,
+    #     masks={"train": train_mask, "val": val_mask, "test": test_mask},
+    #     device=device,
+    #     run_dir=run_dir,
+    #     ds_meta=ds.get("meta", {}),
+    #     args=args,
+    # )
