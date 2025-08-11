@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 # Reuse helpers from MB-TFE impl to avoid duplication
-from .model_mbtfe import _cheb_basis, _bessel_coeffs_heat, X0
+from .mbtfe_model import _cheb_basis, _bessel_coeffs_heat, X0
 
 
 class TFEConv(nn.Module):
