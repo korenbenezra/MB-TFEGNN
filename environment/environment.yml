@@ -1,13 +1,20 @@
+# environment-gpu.yml
 name: mbtfe
 channels:
-  - pyg
   - pytorch
+  - nvidia
+  - pyg
   - conda-forge
 dependencies:
-  - python>=3.10,<3.13
+  - python=3.10
+  - numpy>=1.23,<2.0
+  - pytorch=2.3.*
+  - torchvision=0.18.*
+  - torchaudio=2.3.*
+  - pytorch-cuda=12.1   # pulls the correct CUDA runtime
+  - pyg=2.4.*           # torch-geometric via conda (matches torch)
   - pip
-  - numpy
-  - pytorch
-  - torchvision
-  - torchaudio
-  - pyg
+  - pip:
+      # pure-Python extras only
+      - matplotlib
+      - pandas
