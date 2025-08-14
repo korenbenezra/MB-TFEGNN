@@ -4,8 +4,8 @@ from __future__ import annotations
 import torch
 import torch.nn as nn
 
-from mbtfe_conv import MBTFEConv
-from mbtfe_helper import X0
+from .mbtfe_conv import MBTFEConv
+from .mbtfe_helper import X0
 
 class MBTFEModel(nn.Module):
     """

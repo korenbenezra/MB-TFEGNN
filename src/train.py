@@ -17,7 +17,7 @@ from . import metrics
 
 # models (mbtfe is our default; tfe is optional baseline)
 from .mbtfe_model import MBTFEModel
-from .model_tfe import TFEModel
+from .tfe_model import TFEModel
 
 # helpers from CLI (to avoid duplication)
 from .cli import parse_tau, parse_float_list

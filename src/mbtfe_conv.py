@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 
-from mbtfe_helper import _cheb_basis, _bessel_coeffs_heat, X0
+from .mbtfe_helper import _cheb_basis, _bessel_coeffs_heat, X0
 
 class MBTFEConv(nn.Module):
     """
