@@ -1,11 +1,17 @@
+<<<<<<< HEAD
+=======
+# environment-gpu.yml (fixed)
+>>>>>>> a4582be54e833af7da528bf3da7e262a40315289
 name: mbtfe
 channels:
   - pytorch
   - nvidia
   - pyg
   - conda-forge
+  - defaults
 dependencies:
   - python=3.10
+<<<<<<< HEAD
   - numpy>=1.23,<2.0
   - pytorch=2.3.*
   - torchvision=0.18.*
@@ -15,3 +21,14 @@ dependencies:
   - matplotlib
   - pandas
   - pip
+=======
+  - numpy>=1.24,<2
+  - pytorch=2.3.1
+  - torchvision=0.18.1
+  - torchaudio=2.3.1
+  - pytorch-cuda=12.1        # matches the PyTorch 2.3.* CUDA build
+  - pyg=2.5.*                # PyTorch Geometric compatible with torch 2.3.*
+  - pandas                   # use conda, not pip
+  - matplotlib               # use conda, not pip
+  - pip
+>>>>>>> a4582be54e833af7da528bf3da7e262a40315289
