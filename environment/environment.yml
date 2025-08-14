@@ -4,18 +4,24 @@ channels:
   - nvidia
   - pyg
   - conda-forge
+  - defaults
 dependencies:
   - python=3.10
-  - numpy>=1.23,<2.0
-  # ---- PyTorch stack pinned to the last PYG-supported major (2.1.*) ----
-  - pytorch=2.1.0
-  - torchvision=0.16.0
-  - torchaudio=2.1.0
-  # ---- CUDA runtime that matches this PyTorch build ----
-  - pytorch-cuda=11.8
-  # ---- PyTorch Geometric meta-package (conda) ----
-  - pyg=2.4.0
-  # ---- Common scientific stack ----
-  - matplotlib
-  - pandas
+  # Core DL stack (kept in conda, stable and CUDA-aware)
+  - pytorch=2.4.*
+  - torchvision=0.19.*
+  - torchaudio=2.4.*
+  - pytorch-cuda=12.1        # <- brings the right CUDA runtime; do NOT add other cuda-* libs
+  - pyg=2.6.*                # <- installs torch-{scatter,cluster,sparse,spline}-matching your torch+cuda
+  # Numerics / data
+  - numpy>=1.23,<2.0         # <- keep <2.0 per your project requirement
+  - pandas=2.2.*
+  - scipy=1.11.*
   - pip
+  - pip:
+      # Put fast-moving Python-only libs here; safer than mixing with conda CUDA stack
+      - transformers==4.54.1
+      - tokenizers==0.21.4
+      - tqdm>=4.66
+      - pyyaml>=6.0
+      - ipykernel>=6.29

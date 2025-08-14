@@ -18,7 +18,7 @@ from . import metrics
 # models (mbtfe is our default; tfe is optional baseline)
 from .mbtfe_model import MBTFEModel
 from .tfe_model import TFEModel
-
+from .final_eval_helper import do_final_eval_and_plots
 # helpers from CLI (to avoid duplication)
 from .cli import parse_tau, parse_float_list
 
@@ -178,17 +178,25 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     utils.save_json(Path(run_dir) / "history.json", history)
 
     # console summary
+    # NEW: final eval (best checkpoint)
+    # Include L_sym in masks for edge dropout robustness testing
+    masks_with_sym = {
+        "train": train_mask, 
+        "val": val_mask, 
+        "test": test_mask,
+        "L_sym": ds["L_sym"].to(device) if "L_sym" in ds else None
+    }
+    
+    final = do_final_eval_and_plots(
+        model=model,
+        saver=saver,
+        X=X, L_hat=L_hat, y=y,
+        masks=masks_with_sym,
+        device=device,
+        run_dir=run_dir,
+        ds_meta=ds.get("meta", {}),
+        args=args,
+    )
+    
     print(json.dumps({"BEST_VAL_ACC": best_val_acc, "RUN_DIR": str(run_dir)}, indent=2))
     return final
-
-    # NEW: final eval (best checkpoint)
-    # final = do_final_eval_and_plots(
-    #     model=model,
-    #     saver=saver,
-    #     X=X, L_hat=L_hat, y=y,
-    #     masks={"train": train_mask, "val": val_mask, "test": test_mask},
-    #     device=device,
-    #     run_dir=run_dir,
-    #     ds_meta=ds.get("meta", {}),
-    #     args=args,
-    # )
