@@ -81,7 +81,7 @@ def load_dataset(
 
     # Try cache
     if cache and Path(proc_path).exists():
-        obj = torch.load(proc_path, map_location="cpu")
+        obj = torch.load(proc_path, map_location="cpu", weights_only=True)
         X = obj["X"]
         y = obj["y"]
         L_sym = obj["L_sym"]
@@ -282,11 +282,24 @@ def _resolve_splits(
 ) -> Tuple[Tensor, Tensor, Tensor]:
     """Choose public masks if available and split_id is None; else use/create random splits."""
     if public_masks is not None and split_id is None:
-        return public_masks["train_mask"], public_masks["val_mask"], public_masks["test_mask"]
+        # Handle the case where masks are 2D tensors [n, splits] - take the first split (column)
+        train_mask = public_masks["train_mask"]
+        val_mask = public_masks["val_mask"]
+        test_mask = public_masks["test_mask"]
+        
+        # Convert 2D masks to 1D if needed
+        if train_mask.dim() > 1:
+            train_mask = train_mask[:, 0]
+        if val_mask.dim() > 1:
+            val_mask = val_mask[:, 0]
+        if test_mask.dim() > 1:
+            test_mask = test_mask[:, 0]
+            
+        return train_mask, val_mask, test_mask
 
     # Load or create random splits file
     if splits_path.exists():
-        saved = torch.load(splits_path, map_location="cpu")
+        saved = torch.load(splits_path, map_location="cpu", weights_only=True)
         splits = saved.get("splits", None)
         if not splits:
             splits = _make_and_save_random_splits(y, splits_path, n_random_splits, seed)

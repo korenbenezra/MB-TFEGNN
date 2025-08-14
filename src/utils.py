@@ -154,7 +154,7 @@ class CheckpointSaver:
     def load_best(self, model: torch.nn.Module, map_location: Optional[str | torch.device] = None) -> None:
         if not self.best_path.exists():
             raise FileNotFoundError(f"No best checkpoint found at {self.best_path}")
-        state = torch.load(self.best_path, map_location=map_location or "cpu")
+        state = torch.load(self.best_path, map_location=map_location or "cpu", weights_only=True)
         model.load_state_dict(state["model"])
 
     def _atomic_save(self, path: Path, obj: Dict[str, Any]) -> None:

@@ -52,16 +52,31 @@ def _bessel_coeffs_heat(tau: torch.Tensor, K: int, device=None, dtype=None) -> t
     # Build orders 0..K as a tensor
     orders = torch.arange(0, K + 1, device=device, dtype=dtype)
     # For integer orders, iv should work; fallback if not available
-    if not hasattr(torch.special, "iv"):
-        # Very conservative fallback via small-order series for modest K, small tau
-        # I_k(tau) ~ sum_{m=0}^\infty (1/m! Gamma(m+k+1)) (tau/2)^{2m+k}
-        # For simplicity/robustness, require PyTorch with special.iv; otherwise raise.
-        raise RuntimeError(
-            "torch.special.iv is required to compute Bessel coefficients. "
-            "Please upgrade PyTorch (>=1.11) or install a compatible version."
-        )
-
-    Ik = torch.special.iv(orders, tau)  # shape [K+1]
+    if hasattr(torch.special, "iv"):
+        Ik = torch.special.iv(orders, tau)  # shape [K+1]
+    else:
+        # Fallback using scipy's Bessel functions
+        try:
+            from scipy import special as sp_special
+            import numpy as np
+            
+            # Convert to numpy, compute with scipy, then back to torch
+            tau_np = tau.cpu().numpy()
+            orders_np = orders.cpu().numpy()
+            
+            # Compute for each order (manually since scipy doesn't broadcast like torch)
+            Ik_list = []
+            for k in range(K + 1):
+                Ik_list.append(float(sp_special.iv(k, tau_np.item())))
+            
+            # Convert back to torch tensor
+            Ik = torch.tensor(Ik_list, device=device, dtype=dtype)
+        except ImportError:
+            # If scipy isn't available, provide a helpful error
+            raise RuntimeError(
+                "Neither torch.special.iv nor scipy.special is available. "
+                "Please either upgrade PyTorch (>=1.11) or install scipy: pip install scipy"
+            )
     sign = torch.where((orders % 2) == 0, torch.ones_like(orders), -torch.ones_like(orders))  # (-1)^k
     e = torch.exp(-tau)
 
