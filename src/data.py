@@ -80,29 +80,29 @@ def load_dataset(
     os.makedirs(splits_path.parent, exist_ok=True)
 
     # Try cache
-    if cache and Path(proc_path).exists():
-        #obj = torch.load(proc_path, map_location="cpu", weights_only=True)
-        #X = obj["X"]
-        #y = obj["y"]
-        #L_sym = obj["L_sym"]
-        #L_hat = obj["L_hat"]
-        #meta = obj["meta"]
-        # Splits: use requested logic below (public if present, else from splits file)
-        train_mask, val_mask, test_mask = _resolve_splits(
-            name=name,
-            y=y,
-            splits_path=splits_path,
-            split_id=split_id,
-            n_random_splits=n_random_splits,
-            seed=seed,
-            public_masks=obj.get("public_masks", None),
-        )
-        return {
-            "X": X, "y": y,
-            "train_mask": train_mask, "val_mask": val_mask, "test_mask": test_mask,
-            "L_sym": L_sym.coalesce(), "L_hat": L_hat.coalesce(),
-            "meta": meta,
-        }
+    # if cache and Path(proc_path).exists():
+    #     #obj = torch.load(proc_path, map_location="cpu", weights_only=True)
+    #     #X = obj["X"]
+    #     #y = obj["y"]
+    #     #L_sym = obj["L_sym"]
+    #     #L_hat = obj["L_hat"]
+    #     #meta = obj["meta"]
+    #     # Splits: use requested logic below (public if present, else from splits file)
+    #     train_mask, val_mask, test_mask = _resolve_splits(
+    #         name=name,
+    #         y=y,
+    #         splits_path=splits_path,
+    #         split_id=split_id,
+    #         n_random_splits=n_random_splits,
+    #         seed=seed,
+    #         public_masks=obj.get("public_masks", None),
+    #     )
+    #     return {
+    #         "X": X, "y": y,
+    #         "train_mask": train_mask, "val_mask": val_mask, "test_mask": test_mask,
+    #         "L_sym": L_sym.coalesce(), "L_hat": L_hat.coalesce(),
+    #         "meta": meta,
+    #     }
 
     # Otherwise: load raw via PyG
     X, y, edge_index, public_masks, meta = _load_with_pyg(name=name, root=root)
