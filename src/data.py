@@ -81,7 +81,7 @@ def load_dataset(
 
     # Try cache
     if cache and Path(proc_path).exists():
-        obj = torch.load(proc_path, map_location="cpu", weights_only=True)
+        obj = torch.load(proc_path, map_location="cpu")
         X = obj["X"]
         y = obj["y"]
         L_sym = obj["L_sym"]
