@@ -81,12 +81,12 @@ def load_dataset(
 
     # Try cache
     if cache and Path(proc_path).exists():
-        obj = torch.load(proc_path, map_location="cpu", weights_only=True)
-        X = obj["X"]
-        y = obj["y"]
-        L_sym = obj["L_sym"]
-        L_hat = obj["L_hat"]
-        meta = obj["meta"]
+        #obj = torch.load(proc_path, map_location="cpu", weights_only=True)
+        #X = obj["X"]
+        #y = obj["y"]
+        #L_sym = obj["L_sym"]
+        #L_hat = obj["L_hat"]
+        #meta = obj["meta"]
         # Splits: use requested logic below (public if present, else from splits file)
         train_mask, val_mask, test_mask = _resolve_splits(
             name=name,
